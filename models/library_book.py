@@ -7,6 +7,9 @@ from datetime import timedelta as td
 
 
 class LibraryBook(models.Model):
+    """
+    JLS : Attributes
+    """
     _name = 'library.book'
     # _inherit = ['base.archive']     # Page 90(113)
     # Page 81(104)
@@ -15,22 +18,26 @@ class LibraryBook(models.Model):
          'UNIQUE (name)',
          'Book title must be unique.')
     ]
-
     # Page 66(89)
-    _rec_name = 'short_name'
+    _rec_name = "short_name"
     _order = 'name, date_release desc'
 
     name = fields.Char('Title', required=True)
-    date_release = fields.Date('Release Date')
-    author_ids = fields.Many2many('res.partner', string='Authors')
     # The Char fields suppot a few specific attribues.
     short_name = fields.Char(
         string='Short Title',
-        size=100,  # For Char only !!! In general, it is advised not to use it !!!
+        # size=100,  # For Char only !!! In general, it is advised not to use it !!!
         translate=False,  # also for Text fields
     )
     notes = fields.Text('Internal Notes')
-    # The HTML fields also hve specific attribues
+    date_release = fields.Date('Release Date')
+    author_ids = fields.Many2many('res.partner', string='Authors')
+    state = fields.Selection([('draft', 'Unavailable'),
+                              ('available', 'Available'),
+                              ('borrowed', 'Borrowed'),
+                              ('lost', 'Lost')],
+                             'State')
+    # The HTML fields also hve specific attributes
     description = fields.Html(
         'Description',
         # optional:
@@ -44,7 +51,7 @@ class LibraryBook(models.Model):
         'Reader Average Rating',
         (14, 4),  # Optional precision (total, decimals)
     )
-    # All these fields suppot a few common attributes:
+    # All these fields (above) support a few common attributes (like this):
     pages = fields.Integer(
         string='Number of Pages',
         default=0,
@@ -57,11 +64,6 @@ class LibraryBook(models.Model):
         required=False,
         company_dependent=False,
     )
-    state = fields.Selection([('draft', 'Unavailable'),
-                              ('available', 'Available'),
-                              ('borrowed', 'Borrowed'),
-                              ('lost', 'Lost')],
-                             'State')
 
     # Page 71(94)
     cost_price = fields.Float(
@@ -98,6 +100,20 @@ class LibraryBook(models.Model):
     publisher_city = fields.Char(
         'Publisher City',
         related='publisher_id.city')
+
+    """ 
+    JLS : Methods 
+    """
+
+    # Page 66(89) De base, affiche le nom de l'onglet (representation)
+    def name_get(self):
+        res = []
+        for rec in self:
+            res.append(
+                (rec.id,
+                 u"%s (%s)" % (rec.name, rec.author_ids.name)
+                 ))
+        return res
 
     # Page 81(104)
     @api.constrains('date_release')
@@ -157,6 +173,9 @@ class LibraryBook(models.Model):
     # FIN Page 96(119) #
 
 
+"""
+JLS : Classes complémentaires (idéalement dans d'autres fichiers)
+"""
 # Page 75(98)
 class ResPartner(models.Model):
     _inherit = 'res.partner'
