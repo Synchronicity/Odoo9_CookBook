@@ -7,17 +7,10 @@ from datetime import timedelta as td
 
 
 class LibraryBook(models.Model):
-    """
-    JLS : Attributes
-    """
+    #   JLS : Attributes
     _name = 'library.book'
     # _inherit = ['base.archive']     # Page 90(113)
-    # Page 81(104)
-    _sql_constraints = [
-        ('name_uniq',
-         'UNIQUE (name)',
-         'Book title must be unique.')
-    ]
+
     # Page 66(89)
     _rec_name = "short_name"
     _order = 'name, date_release desc'
@@ -31,7 +24,8 @@ class LibraryBook(models.Model):
     )
     notes = fields.Text('Internal Notes')
     date_release = fields.Date('Release Date')
-    author_ids = fields.Many2many('res.partner', string='Authors')
+    author_ids = fields.Many2many(comodel_name='res.partner',
+                                  string='Authors')
     state = fields.Selection([('draft', 'Unavailable'),
                               ('available', 'Available'),
                               ('borrowed', 'Borrowed'),
@@ -71,7 +65,7 @@ class LibraryBook(models.Model):
 
     # Page 73(96)
     currency_id = fields.Many2one(
-        'res.currency', string='Currency')
+        comodel_name='res.currency', string='Currency')
     retail_price = fields.Monetary(
         'Retail Price',
         # optional: currency_field='currency_id',
@@ -79,12 +73,19 @@ class LibraryBook(models.Model):
 
     # Page 74(97)
     publisher_id = fields.Many2one(
-        'res.partner', string='Publisher',
+        comodel_name='res.partner', string='Publisher',
         # optional:
         ondelete='set null',
         context={},
         domain=[],
     )
+
+    # Page 81(104) ==> library_book_categ ?!?
+    _sql_constraints = [
+        ('name_uniq',
+         'UNIQUE (name)',
+         'Book title must be unique.')
+    ]
 
     # Page 82(105)
     age_days = fields.Float(
@@ -101,10 +102,7 @@ class LibraryBook(models.Model):
         'Publisher City',
         related='publisher_id.city')
 
-    """ 
-    JLS : Methods 
-    """
-
+    #   JLS : Methods
     # Page 66(89) De base, affiche le nom de l'onglet (representation)
     def name_get(self):
         res = []
@@ -123,6 +121,7 @@ class LibraryBook(models.Model):
                 raise models.ValidationError(
                     'Release date must be in the past')
 
+    # Page 83(106)
     @api.depends('date_release')
     def _compute_age(self):
         today = fDate.from_string(fDate.today())
@@ -136,7 +135,7 @@ class LibraryBook(models.Model):
             d = td(days=book.age_days) - today
             book.date_release = fDate.to_string(d)
 
-    def _search_age(self, operator, value):
+    def _search_age(operator, value):
         today = fDate.from_string(fDate.today())
         value_days = td(days=value)
         value_date = fDate.to_string(today - value_days)
@@ -173,27 +172,25 @@ class LibraryBook(models.Model):
     # FIN Page 96(119) #
 
 
-"""
-JLS : Classes complémentaires (idéalement dans d'autres fichiers)
-"""
+# JLS : Classes complémentaires (idéalement dans d'autres fichiers)
 # Page 75(98)
 class ResPartner(models.Model):
     _inherit = 'res.partner'
     _order = 'name'
 
     books_ids = fields.One2many(
-        'library.book', inverse_name='publisher_id',
+        comodel_name='library.book', inverse_name='publisher_id',
         string='Published Books')
 
     book_ids = fields.Many2many(
-        'library.book',
-        string='Authored Books',
+        comodel_name='library.book',
         # relation='library_book_res_partner_rel'  # optional
+        string='Authored Books',
     )
 
     # Page 88(111)
     authored_book_ids = fields.Many2many(
-        'library.book', string='Authored Books')
+        comodel_name='library.book', string='Authored Books')
     count_books = fields.Integer(
         'Number of Authored Books',
         compute='_compute_count_books'
@@ -221,7 +218,7 @@ class LibraryMember(models.Model):
     _inherits = {'res.partner': 'partner_id'}
 
     partner_id = fields.Many2one(
-        'res.partner',
+        comodel_name='res.partner',
         ondelete='cascade')
 
     date_start = fields.Date('Member Since')
