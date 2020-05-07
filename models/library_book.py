@@ -7,9 +7,7 @@ from datetime import timedelta as td
 
 
 class LibraryBook(models.Model):
-    """
-    JLS : Attributes
-    """
+    #   JLS : Attributes
     _name = 'library.book'
     # _inherit = ['base.archive']     # Page 90(113)
 
@@ -104,10 +102,7 @@ class LibraryBook(models.Model):
         'Publisher City',
         related='publisher_id.city')
 
-
-    """
-    JLS : Methods
-    """
+    #   JLS : Methods
     # Page 66(89) De base, affiche le nom de l'onglet (representation)
     def name_get(self):
         res = []
@@ -140,7 +135,6 @@ class LibraryBook(models.Model):
             d = td(days=book.age_days) - today
             book.date_release = fDate.to_string(d)
 
-    @staticmethod
     def _search_age(operator, value):
         today = fDate.from_string(fDate.today())
         value_days = td(days=value)
@@ -178,11 +172,7 @@ class LibraryBook(models.Model):
     # FIN Page 96(119) #
 
 
-"""
-JLS : Classes complémentaires (idéalement dans d'autres fichiers)
-"""
-
-
+# JLS : Classes complémentaires (idéalement dans d'autres fichiers)
 # Page 75(98)
 class ResPartner(models.Model):
     _inherit = 'res.partner'

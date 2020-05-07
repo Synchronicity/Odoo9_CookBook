@@ -18,21 +18,22 @@
             <field name="name">Library Book Form</field>
             <field name="model">library.book</field>
             <field name="arch" type="xml">
-
                 <form>
                     <sheet>
-                        <group>
-                            <field name="name"/>
-                            <field name="short_name"/>
-                            <field name="author_ids" widget="many2many_tags"/>
-                            <field name="state"/>
-                        </group>
-                        <group>
-                            <field name="date_release"/>
+                        <group name="'group_top">
+                            <group name="group_lef">
+                                <field name="name"/>
+                                <field name="short_name"/>
+                                <field name="author_ids" widget="many2many_tags"/>
+                                <field name="state"/>
+                            </group>
+                            <group name="group_right">
+                                <field name="date_release"/>
+                                <field name="age_days"/>
+                            </group>
                         </group>
                     </sheet>
                 </form>
-
             </field>
         </record>
 
@@ -40,14 +41,12 @@
             <field name="name">Library Book List</field>
             <field name="model">library.book</field>
             <field name="arch" type="xml">
-
                 <tree>
                     <field name="name"/>
                     <field name="short_name"/>
                     <field name="date_release"/>
                     <field name="state"/>
                 </tree>
-
             </field>
         </record>
 
@@ -55,13 +54,11 @@
             <field name="name">Library Book Search</field>
             <field name="model">library.book</field>
             <field name="arch" type="xml">
-
                 <search>
                     <field name="name"/>
                     <field name="author_ids"/>
                     <filter string="JLS Author" domain="[('author_ids','=','JLS')]"/>
                 </search>
-
             </field>
         </record>
 
