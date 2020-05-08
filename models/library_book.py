@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
+import os  # P 99
 from openerp import models, fields
 from openerp.addons import decimal_precision as dp
 from openerp import api
 from openerp.fields import Date as fDate
 from datetime import timedelta as td
+from openerp.exceptions import UserError  # P 99
 
 
 class LibraryBook(models.Model):
@@ -169,7 +171,12 @@ class LibraryBook(models.Model):
                 book.state = new_state
             else:
                 continue
-    # FIN Page 96(119) #
+
+    # Page 101(124)
+    @api.model
+    def get_all_library_members(self):
+        library_member_model = self.env['library.member']
+        return library_member_model.search([])
 
 
 # JLS : Classes complémentaires (idéalement dans d'autres fichiers)
@@ -224,3 +231,24 @@ class LibraryMember(models.Model):
     date_start = fields.Date('Member Since')
     date_end = fields.Date('Termination Date')
     member_number = fields.Char()
+
+
+# Page 99(122)
+class SomeModel(models.Model):
+    _name = 'some.model'
+
+    data = fields.Text('Data')
+
+    @api.multi
+    def save(self, filename):
+        if '/' in filename or '\\' in filename:
+            raise UserError('Illegal filename %s' % filename)
+        path = os.path.join('/opt/exports', filename)
+        try:
+            with open(path, 'w') as fobj:
+                for record in self:
+                    fobj.write(record.data)
+                    fobj.write('\n')
+        except (IOError, OSError) as exc:
+            message = 'Unable to save file: %s' % exc
+            raise UserError(message)
