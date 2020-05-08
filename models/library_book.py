@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-import os  # P 99
+import os                                           # P 99
 from openerp import models, fields
 from openerp.addons import decimal_precision as dp
 from openerp import api
 from openerp.fields import Date as fDate
 from datetime import timedelta as td
-from openerp.exceptions import UserError  # P 99
+from openerp.exceptions import UserError            # P 99
 
 
 class LibraryBook(models.Model):
@@ -236,7 +236,6 @@ class LibraryMember(models.Model):
 # Page 99(122)
 class SomeModel(models.Model):
     _name = 'some.model'
-
     data = fields.Text('Data')
 
     @api.multi
